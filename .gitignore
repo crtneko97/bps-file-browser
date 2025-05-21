@@ -1,1 +1,14 @@
-/target
+# Rust
+/target/
+**/*.rs.bk
+
+# Editor configs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+
+# Env files
+.env
+
