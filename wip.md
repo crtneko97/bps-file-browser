@@ -58,3 +58,62 @@ clap   = { version = "4.0", features = ["derive"] }
 | **attr**                     | The slot’s transfer type (Bulk, Interrupt, …).                                                                         |
 | **Bulk transfer**            | High-volume, reliable data (no timing guarantees). Ideal for file data.                                                |
 | **Interrupt transfer**       | Small, low-latency messages. Good for status or event notifications.                                                   |
+
+
+---
+
+## Progress
+
+* **USB detection**: used `rusb::Context::new()` and `ctx.devices()` to list all USB devices.
+
+  ```rust
+  let ctx = Context::new()?;
+  for device in ctx.devices()?.iter() { /* ... */ }
+  ```
+
+* **Device setup**: detached the kernel driver, set config #1, and claimed interface 0.
+
+  ```rust
+  if handle.kernel_driver_active(0)? {
+      handle.detach_kernel_driver(0)?;
+  }
+  handle.set_active_configuration(1)?;
+  handle.claim_interface(0)?;
+  ```
+
+* **Endpoint discovery**: printed Bulk-IN and Bulk-OUT endpoints for MTP.
+
+  ```rust
+  for ep in descriptor.endpoint_descriptors() {
+      println!("endpoint 0x{:02x}, {:?}", ep.address(), ep.transfer_type());
+  }
+  ```
+
+* **MTP session**: framed and sent a `GetDeviceInfo` command over bulk transfers.
+
+  ```rust
+  let mut session = MtpSession::new(handle)?;
+  let info = session.get_device_info()?;
+  ```
+
+## Next steps
+
+* Parse the `GetDeviceInfo` response into a human-readable struct.
+* Add `list`, `pull`, and `push` commands to browse and transfer files.
+
+> 🔒 Safe to push: no passwords, keys, or private info in this repo.
+
+## Quick run
+
+* Build and scan with:
+
+  ```bash
+  cargo build
+  cargo run -- scan --xiaomi
+  ```
+
+## Notes
+
+* Code is organized into modules: `cli.rs`, `usb.rs`, `mtp.rs`.
+* The `scan` command opens the phone, lists endpoints, and performs a simple MTP `GetDeviceInfo`.
+* Next: parse responses and implement `list`, `pull`, and `push` commands.

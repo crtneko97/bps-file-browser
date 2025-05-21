@@ -1,63 +1,37 @@
 use anyhow::Result;
-use rusb::{Context, DeviceDescriptor, DeviceHandle, UsbContext}; 
 use clap::Parser;
 
-#[derive(Parser)]
-#[command(author, version, about="USB phone detector")]
-struct Cli 
-{
-    #[arg(long)]
-    xiaomi: bool,
-}
+mod cli;
+mod usb;
+mod mtp;
 
 fn main() -> Result<()> 
 {
-    let args = Cli::parse();
-    let ctx = Context::new()?;
-    println!("Scanning USB bus for devices");
+    let args = cli::Cli::parse();
 
-    for device in ctx.devices()?.iter() 
+    match args.command 
     {
-       let desc = device.device_descriptor()?; 
-       if args.xiaomi && desc.vendor_id() != 0x2717
-       {
-           continue;
-       }
-
-    println!("Found device VID={:04x}, PID={:04x}", 
-        desc.vendor_id(), 
-        desc.product_id());
-
-    let mut handle: DeviceHandle<_> = device.open()
-        .map_err(|e| anyhow::anyhow!("Failed to open device: {}", e))?;
-
-    if let Err(e) = handle.set_active_configuration(1)
-    {
-        eprintln!("Could not set configuration #1 (maybe it's already set): {}", e);
-    }
-
-   // mtp is often on interface 0 or 1. 
-    handle.claim_interface(0)
-       .map_err(|e| anyhow::anyhow!("Could not claim interface 0: {}", e))?;
-
-    let config = handle.device().active_config_descriptor()?;
-    for interface in config.interfaces()
-    {
-        for descriptor in interface.descriptors()
+        cli::Command::Scan { xiaomi } => 
         {
-            for endpoint in descriptor.endpoint_descriptors()
+            if xiaomi 
             {
-                let addr = endpoint.address();
-                let attr = endpoint.transfer_type();
-                println!(
-                " → interface {}.{} endpoint 0x{:02x}, {:?}",
-                interface.number(), descriptor.setting_number(), addr, attr
-                );
+                println!("Looking for Xiaomi phone…");
+
+                let handle = usb::open_xiaomi()?;
+                println!("Xiaomi opened! Endpoints:");
+                usb::list_endpoints(&handle)?;
+
+                let mut session = mtp::MtpSession::new(handle)?;
+                let info = session.get_device_info()?;
+                println!("Raw GetDeviceInfo response: {:x?}", info);
+            }
+            else 
+            {
+                println!("Non-Xiaomi scan not implemented yet.");
             }
         }
     }
-    break;
-    }
+
     Ok(())
 }
 
