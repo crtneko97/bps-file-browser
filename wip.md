@@ -96,13 +96,6 @@ clap   = { version = "4.0", features = ["derive"] }
   let info = session.get_device_info()?;
   ```
 
-## Next steps
-
-* Parse the `GetDeviceInfo` response into a human-readable struct.
-* Add `list`, `pull`, and `push` commands to browse and transfer files.
-
-> 🔒 Safe to push: no passwords, keys, or private info in this repo.
-
 ## Quick run
 
 * Build and scan with:
