@@ -1,5 +1,5 @@
 # bps-file-browser
-
+***WIP***
 This tool will start out working for my Xiaomi phone.
 
 ## Overview
@@ -45,6 +45,3 @@ clap   = { version = "4.0", features = ["derive"] }
   without writing your own argument parsing.
 
 ---
-
-Copy this content into your `README.md` and push to GitHub. It will render properly with headings, code blocks, and lists.
-
