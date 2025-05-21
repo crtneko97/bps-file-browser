@@ -45,3 +45,16 @@ clap   = { version = "4.0", features = ["derive"] }
   without writing your own argument parsing.
 
 ---
+
+| Term                         | What it is / why it matters                                                                                            |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **DeviceDescriptor**         | A little struct that holds a device’s “business card” (vendor\_id, product\_id, class, etc.).                          |
+| **vendor\_id / product\_id** | Hex codes identifying *who* made the device (vendor) and *what* it is (product).                                       |
+| **DeviceHandle<\_>**         | Your exclusive “key” to the device. The `<_>` is just a placeholder telling Rust “you figure out the exact type here.” |
+| **Configuration**            | A mode or “floor” of the device. We chose configuration 1 because that’s where MTP lives.                              |
+| **Interface**                | An “office” on that floor. Claiming it locks it for your use.                                                          |
+| **Endpoint**                 | A “mail slot” on the office door. Data goes in or out here.                                                            |
+| **addr**                     | The slot’s number + direction bit (IN vs. OUT).                                                                        |
+| **attr**                     | The slot’s transfer type (Bulk, Interrupt, …).                                                                         |
+| **Bulk transfer**            | High-volume, reliable data (no timing guarantees). Ideal for file data.                                                |
+| **Interrupt transfer**       | Small, low-latency messages. Good for status or event notifications.                                                   |
