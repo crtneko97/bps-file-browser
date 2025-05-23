@@ -1,4 +1,5 @@
 # bps-file-browser
+
 ***WIP***
 This tool will start out working for my Xiaomi phone.
 
@@ -59,7 +60,6 @@ clap   = { version = "4.0", features = ["derive"] }
 | **Bulk transfer**            | High-volume, reliable data (no timing guarantees). Ideal for file data.                                                |
 | **Interrupt transfer**       | Small, low-latency messages. Good for status or event notifications.                                                   |
 
-
 ---
 
 ## Progress
@@ -89,24 +89,45 @@ clap   = { version = "4.0", features = ["derive"] }
   }
   ```
 
-* **MTP session**: framed and sent a `GetDeviceInfo` command over bulk transfers.
+* **MTP session**: framed and sent a `GetDeviceInfo` command over bulk transfers, then parsed it.
 
   ```rust
   let mut session = MtpSession::new(handle)?;
-  let info = session.get_device_info()?;
+  let raw = session.get_device_info()?;
+  let info = MtpSession::parse_device_info(&raw)?;
+  println!("Manufacturer: {}", info.manufacturer);
+  ```
+
+* **CLI commands**: added `scan` and `list` subcommands with `--xiaomi` flag.
+
+  ```bash
+  usb_file_browser scan --xiaomi
+  usb_file_browser list --xiaomi
   ```
 
 ## Quick run
 
-* Build and scan with:
+* Build and scan:
 
   ```bash
   cargo build
   cargo run -- scan --xiaomi
   ```
 
+* List placeholder:
+
+  ```bash
+  cargo run -- list --xiaomi
+  ```
+
 ## Notes
 
 * Code is organized into modules: `cli.rs`, `usb.rs`, `mtp.rs`.
-* The `scan` command opens the phone, lists endpoints, and performs a simple MTP `GetDeviceInfo`.
-* Next: parse responses and implement `list`, `pull`, and `push` commands.
+* Next steps:
+
+  1. Implement `get_storage_ids()` and `get_object_handles()` in `MtpSession`.
+  2. Replace `list` stub with real MTP calls to enumerate files.
+  3. Add `pull` and `push` commands for downloads/uploads.
+
+---
+

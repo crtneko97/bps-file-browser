@@ -22,14 +22,41 @@ fn main() -> Result<()>
                 usb::list_endpoints(&handle)?;
 
                 let mut session = mtp::MtpSession::new(handle)?;
-                let info = session.get_device_info()?;
-                println!("Raw GetDeviceInfo response: {:x?}", info);
+                
+                let raw = session.get_device_info()?;
+                let info = mtp::MtpSession::parse_device_info(&raw)?;
+                println!("Manufacturer:  {}", info.manufacturer);
+                println!("Model:         {}", info.model);
+                println!("Serial number: {}", info.serial_number);
+
             }
             else 
             {
                 println!("Non-Xiaomi scan not implemented yet.");
             }
         }
+        
+        cli::Command::List { xiaomi } =>
+        {
+            if xiaomi
+            {
+                println!("Listing files on Xiaomi..");
+                let handle = usb::open_xiaomi()?;
+                let mut session = mtp::MtpSession::new(handle)?;
+
+
+
+
+
+
+                println!("(stub) Works. Confirmed BPS-");
+            }
+            else
+            {
+                println!("List for non-Xiamoi not supported.");
+            }
+        }
+        
     }
 
     Ok(())

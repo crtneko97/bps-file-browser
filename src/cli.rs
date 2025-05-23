@@ -11,8 +11,15 @@ pub struct Cli
 #[derive(Subcommand)]
 pub enum Command 
 {
-    Scan {
+    Scan 
+    {
         #[arg(long)]
         xiaomi: bool,
     },
+    List
+    {
+        #[arg(long)]
+        xiaomi: bool,
+    },
+
 }
