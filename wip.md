@@ -123,11 +123,5 @@ clap   = { version = "4.0", features = ["derive"] }
 ## Notes
 
 * Code is organized into modules: `cli.rs`, `usb.rs`, `mtp.rs`.
-* Next steps:
-
-  1. Implement `get_storage_ids()` and `get_object_handles()` in `MtpSession`.
-  2. Replace `list` stub with real MTP calls to enumerate files.
-  3. Add `pull` and `push` commands for downloads/uploads.
-
 ---
 
